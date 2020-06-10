@@ -1,0 +1,25 @@
+{
+    "name": "severity/config-loader",
+    "authors": [
+        {
+            "name": "Zoltán Fekete",
+            "email": "z-schwarz@gmx.de"
+        }
+    ],
+    "require": {
+      "ext-yaml": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Severity\\ConfigLoader\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Severity\\ConfigLoader\\Tests\\": "tests/unit"
+        }
+    }
+}

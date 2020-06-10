@@ -1,0 +1,4 @@
+parameters:
+    param4: '%param2%-Baz-%param5[Austria][default_locale]%'
+
+services:

@@ -1,0 +1,22 @@
+parameters:
+    param1: 'foo'
+    param%1: 'foo%'
+    param2: 'baz'
+    param3: '%param\%1%-\%2-%param1%'
+    #        foo%-%2-foo
+    param41: '%param5[Swiss][default_locale]%_DE'
+    param5:
+        Austria:
+            default_locale: de
+            locales:
+                - de
+        Swiss:
+            default_locale: de
+            locales:
+                - de
+                - fr
+
+services:
+    App\:
+        include: 'asdas'
+        exclude: 'asdas'
