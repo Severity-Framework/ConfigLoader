@@ -19,7 +19,7 @@ class ConfigFile
     public function __construct(string $path, string $type = 'yaml')
     {
         if (file_exists($path) === false) {
-            throw new InvalidArgumentException(sprintf('Path "%s" in argument 1 does not exist!', $path));
+            throw new InvalidArgumentException(sprintf('File on path "%s" does not exist!', $path));
         }
 
         if (is_readable($path) === false) {

@@ -23,12 +23,27 @@ class ConfigFileTest extends ConfigLoaderTestCase
         $filePath = $this->getFixturePath('not/existing/file.yaml');
 
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/(does not exist)/');
+
+        new ConfigFile($filePath);
+    }
+    /**
+     * Tests {@see ConfigFile::__construct()}
+     *
+     * @return void
+     */
+    public function testConstructorForNotReadable(): void
+    {
+        $filePath = $this->getFixturePath('Builder/ConfigFile/unreadable_example.yaml');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/(is not readable)/');
 
         new ConfigFile($filePath);
     }
 
     /**
-     * Tests {@see ConfigFile::fetch()}
+     * Tests {@see ConfigFile::fetch()} method.
      *
      * @return void
      */
@@ -45,5 +60,19 @@ class ConfigFileTest extends ConfigLoaderTestCase
         ];
 
         $this->assertSame($expected, $configFile->fetch());
+    }
+
+    /**
+     * Tests {@see ConfigFile::getPath()} method.
+     *
+     * @return void
+     */
+    public function testPath(): void
+    {
+        $testPath = $this->getFixturePath('Builder/ConfigFile/valid_example1.yaml');
+
+        $mockFile = new ConfigFile($testPath);
+
+        $this->assertSame($testPath, $mockFile->getPath());
     }
 }
