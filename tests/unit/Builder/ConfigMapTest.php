@@ -6,7 +6,7 @@ use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Exceptions\ConfigMergeException;
 use Severity\ConfigLoader\Exceptions\InvalidPathSegmentException;
 use Severity\ConfigLoader\Exceptions\NotExistingPathSegmentException;
-use Severity\ConfigLoader\Tests\ConfigLoaderTestCase;
+use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
 
 /**
  * Class ConfigMapTest

@@ -14,27 +14,23 @@ use const PREG_OFFSET_CAPTURE;
 
 class ParameterResolver implements ResolverInterface
 {
-    protected array $matches = [];
-
-    public function isMatching(string $parameterValue): bool
-    {
-        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9\-_\[\]]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
-            $this->matches = $matches;
-
-            return true;
-        }
-
-        return false;
-    }
-
     public function translate(string $parameterValue, ResolveContext $context)
     {
+        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9\-_\[\]\.]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
+            return $this->doReplace($parameterValue, $matches, $context);
+        }
+
+        return $parameterValue;
+    }
+
+    protected function doReplace(string $parameterValue, array $matches, ResolveContext $context): string
+    {
         $diff = 0;
-        foreach ($this->matches[0] as [$match, $pos]) {
+        foreach ($matches[0] as [$match, $pos]) {
             $length = strlen($match);
             $match = substr(str_replace('\%', '%', $match), 1, -1);
 
-            if (preg_match('/^(?P<var>[a-zA-Z0-9\-_%]+)(?:\[(\g<var>)\])+$/', $match) === 1) {
+            if (preg_match('/^(?P<var>[a-zA-Z0-9\-\._%]+)(?:\[(\g<var>)\])+$/', $match) === 1) {
                 $firstComponentPos = strpos($match, '[');
                 $firstPart = substr($match, 0, $firstComponentPos);
 

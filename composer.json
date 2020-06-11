@@ -19,7 +19,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Severity\\ConfigLoader\\Tests\\": "tests/unit"
+            "Severity\\ConfigLoader\\Tests\\Unit\\": "tests/unit",
+            "Severity\\ConfigLoader\\Tests\\Utility\\": "tests/utility"
         }
     }
 }

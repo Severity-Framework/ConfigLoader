@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Severity\ConfigLoader\Tests;
+namespace Severity\ConfigLoader\Tests\Unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

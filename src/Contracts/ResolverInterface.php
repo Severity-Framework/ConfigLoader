@@ -6,7 +6,5 @@ use Severity\ConfigLoader\Resolver\ResolveContext;
 
 interface ResolverInterface
 {
-    public function isMatching(string $parameterValue): bool;
-
     public function translate(string $parameterValue, ResolveContext $context);
 }

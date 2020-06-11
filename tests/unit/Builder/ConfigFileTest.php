@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Severity\ConfigLoader\Tests\Builder;
+namespace Severity\ConfigLoader\Tests\Unit\Builder;
 
 use InvalidArgumentException;
 use Severity\ConfigLoader\Builder\ConfigFile;
-use Severity\ConfigLoader\Tests\ConfigLoaderTestCase;
+use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
 
 /**
  * Class ConfigFileTest

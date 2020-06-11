@@ -58,8 +58,10 @@ class ResolveManager
     protected function resolveStringValue(string $value, ResolveContext $context)
     {
         foreach ($this->configResolvers as $resolver) {
-            if ($resolver->isMatching($value)) {
-                return $resolver->translate($value, $context);
+            $resolved = $resolver->translate($value, $context);
+
+            if ($resolved !== $value) {
+                return $resolved;
             }
         }
 
