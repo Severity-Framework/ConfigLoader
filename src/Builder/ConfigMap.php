@@ -2,63 +2,87 @@
 
 namespace Severity\ConfigLoader\Builder;
 
+use Severity\ConfigLoader\Exceptions\ConfigMergeException;
 use Severity\ConfigLoader\Exceptions\InvalidPathSegmentException;
 use Severity\ConfigLoader\Exceptions\NotExistingPathSegmentException;
 use function array_key_exists;
 use function explode;
 use function implode;
 use function is_array;
+use function is_int;
 use function sprintf;
 
 class ConfigMap
 {
     protected array $configuration;
 
+    protected string $fileInMerge = '';
+
     /**
      * ConfigMap constructor.
+     *
+     * @param array $data
      */
-    public function __construct()
+    public function __construct(array $data = [])
     {
-        $this->configuration = [];
+        $this->configuration = $data;
     }
 
     /**
      * Merges the given array of data with the stored array.
      *
-     * @param array $data
+     * @param ConfigFile $file
+     *
+     * @throws ConfigMergeException
      *
      * @return void
      */
-    public function merge(array $data): void
+    public function merge(ConfigFile $file): void
     {
-        $this->configuration = $this->deepMerge($data, $this->configuration);
+        $this->fileInMerge = $file->getPath();
+
+        $this->configuration = $this->deepMerge($this->configuration, $file->fetch());
+
+        $this->fileInMerge = '';
     }
 
     /**
-     * Merges the 2 given array together and returns the result.
+     * Deeeeeply-merges the 2 given array together and returns the result.
      *
-     * @param array $target
-     * @param array $source
+     * @param array    $a
+     * @param array    $b
+     * @param string[] $path
+     *
+     * @throws ConfigMergeException
      *
      * @return array
      */
-    protected function deepMerge(array $target, array $source): array
+    protected function deepMerge(array $a, array $b, array $path = []): array
     {
-        foreach ($target as $key => $value) {
-            if ($value === null) $value = [];
+        $target = $a;
+        foreach ($b as $key => $val) {
+            $path[] = $key;
 
-            if (is_array($value) && array_key_exists($key, $source) && is_array($source[$key])) {
-                $merged[$key] = $this->deepMerge($source[$key], $value);
-            } else if (is_numeric($key)) {
-                if (!in_array($value, $source)) {
-                    $source[] = $value;
+            if (is_int($key)) {
+                $target[] = $val;
+            } elseif (array_key_exists($key, $target) === false) {
+                $target[$key] = $val;
+            } elseif (is_array($val)) {
+                if (is_array($target[$key]) === false) {
+                    throw new ConfigMergeException(sprintf('Error during merging config file: %s! The existing key "%s" is not an array!', $this->fileInMerge, implode('.', $path)));
                 }
+
+                $target[$key] = $this->deepMerge($target[$key], $val, $path);
             } else {
-                $source[$key] = $value;
+                if (is_array($a[$key])) {
+                    throw new ConfigMergeException(sprintf('Error during merging config file: %s! The existing key "%s" is an array!', $this->fileInMerge, implode('.', $path)));
+                }
+
+                $target[$key] = $val;
             }
         }
 
-        return $source;
+        return $target;
     }
 
     public function get(): array
@@ -125,6 +149,6 @@ class ConfigMap
             $array = $array[$key];
         }
 
-        return $array;
+        return true;
     }
 }

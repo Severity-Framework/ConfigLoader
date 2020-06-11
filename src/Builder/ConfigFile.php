@@ -10,6 +10,12 @@ class ConfigFile
 
     protected string $type;
 
+    /**
+     * ConfigFile constructor.
+     *
+     * @param string $path
+     * @param string $type
+     */
     public function __construct(string $path, string $type = 'yaml')
     {
         if (file_exists($path) === false) {
@@ -22,6 +28,11 @@ class ConfigFile
 
         $this->path = $path;
         $this->type = $type;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
     }
 
     public function fetch(): array

@@ -78,7 +78,7 @@ class Loader
         $configuration = new ConfigMap();
 
         foreach ($this->configFiles as $file) {
-            $configuration->merge($file->fetch());
+            $configuration->merge($file);
         }
 
         $this->resolveManager->resolve($configuration);

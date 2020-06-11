@@ -2,7 +2,9 @@
 
 namespace Severity\ConfigLoader\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Severity\ConfigLoader\Builder\ConfigFile;
 use function dirname;
 
 class ConfigLoaderTestCase extends TestCase
@@ -17,5 +19,33 @@ class ConfigLoaderTestCase extends TestCase
     public function getFixturePath(string $path): string
     {
         return self::$cwd . "fixtures/$path";
+    }
+
+    /**
+     * @param mixed $returnValue
+     *
+     * @return ConfigFile|MockObject
+     */
+    public function mockConfigFileWithFetch($returnValue): ConfigFile
+    {
+        $mock = $this->createMock(ConfigFile::class);
+        $mock->method('fetch')
+            ->willReturn($returnValue);
+
+        return $mock;
+    }
+
+    /**
+     * @param mixed $path
+     *
+     * @return ConfigFile|MockObject
+     */
+    public function mockConfigFileWithPath($path): ConfigFile
+    {
+        $mock = $this->createMock(ConfigFile::class);
+        $mock->method('getPath')
+            ->willReturn($path);
+
+        return $mock;
     }
 }
