@@ -6,10 +6,6 @@ use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Contracts\ResolverInterface;
 use Severity\ConfigLoader\Resolver\ResolveContext;
 use function is_array;
-use function is_bool;
-use function is_float;
-use function is_integer;
-use function is_scalar;
 use function is_string;
 
 class ResolveManager
@@ -24,6 +20,13 @@ class ResolveManager
         $this->configResolvers[] = $resolver;
     }
 
+    /**
+     * Resolves the internal references in the given ConfigMap object.
+     *
+     * @param ConfigMap $configMap
+     *
+     * @return void
+     */
     public function resolve(ConfigMap $configMap): void
     {
         $context = new ResolveContext($configMap);
@@ -33,6 +36,14 @@ class ResolveManager
         $configMap->set($resolvedConfig);
     }
 
+    /**
+     * Resolves the internal references in the given array.
+     *
+     * @param mixed[]        $chunk
+     * @param ResolveContext $context
+     *
+     * @return mixed[]
+     */
     protected function doResolve(array $chunk, ResolveContext $context): array
     {
         foreach ($chunk as $key => $value) {
@@ -50,6 +61,14 @@ class ResolveManager
         return $chunk;
     }
 
+    /**
+     * Scans the given value and tries to resolve any internal references in it. Returns the resolved value.
+     *
+     * @param string|float|int|bool|null  $value
+     * @param ResolveContext              $context
+     *
+     * @return string
+     */
     protected function resolveValue($value, ResolveContext $context)
     {
         if (is_string($value)) {
@@ -59,6 +78,15 @@ class ResolveManager
         return $value;
     }
 
+    /**
+     * Passes the given string to all registered resolver. The first of them returns different value than te current
+     * value gonna be returned back.
+     *
+     * @param string         $value
+     * @param ResolveContext $context
+     *
+     * @return string
+     */
     protected function resolveStringValue(string $value, ResolveContext $context)
     {
         foreach ($this->configResolvers as $resolver) {
