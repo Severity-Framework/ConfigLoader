@@ -6,8 +6,6 @@ use InvalidArgumentException;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
 use function chmod;
-use function fileperms;
-use function var_dump;
 
 /**
  * Class ConfigFileTest
