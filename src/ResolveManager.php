@@ -6,6 +6,9 @@ use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Contracts\ResolverInterface;
 use Severity\ConfigLoader\Resolver\ResolveContext;
 use function is_array;
+use function is_bool;
+use function is_float;
+use function is_integer;
 use function is_scalar;
 
 class ResolveManager
@@ -48,7 +51,7 @@ class ResolveManager
 
     protected function resolveValue($value, ResolveContext $context)
     {
-        if (is_scalar($value)) {
+        if (is_int($value) || is_bool($value) || is_float($value) || $value === null) {
             return $value;
         }
 

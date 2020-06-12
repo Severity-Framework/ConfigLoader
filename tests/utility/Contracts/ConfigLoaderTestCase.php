@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Severity\ConfigLoader\Tests\Unit;
+namespace Severity\ConfigLoader\Tests\Utility\Contracts;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ class ConfigLoaderTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$cwd = dirname(__DIR__) . '/';
+        self::$cwd = dirname(dirname(__DIR__)) . '/';
     }
 
     public static function getFixturePath(string $path): string

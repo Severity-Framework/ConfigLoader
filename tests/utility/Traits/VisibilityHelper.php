@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Severity\ConfigLoader\Tests\Utility;
+namespace Severity\ConfigLoader\Tests\Utility\Traits;
 
 use ReflectionClass;
 use ReflectionException;
@@ -22,7 +22,25 @@ trait VisibilityHelper
 
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
-        
+
         $property->setValue($obj, $data);
+    }
+
+    /**
+     * @param object $obj
+     * @param string $propertyName
+     *
+     * @throws ReflectionException
+     *
+     * @return mixed
+     */
+    protected function getProperty($obj, string $propertyName)
+    {
+        $class = new ReflectionClass($obj);
+
+        $property = $class->getProperty($propertyName);
+        $property->setAccessible(true);
+
+        return $property->getValue($obj);
     }
 }

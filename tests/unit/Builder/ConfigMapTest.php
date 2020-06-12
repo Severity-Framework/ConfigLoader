@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Severity\ConfigLoader\Tests\Builder;
+namespace Severity\ConfigLoader\Tests\Unit\Builder;
 
 use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Exceptions\ConfigMergeException;
 use Severity\ConfigLoader\Exceptions\InvalidPathSegmentException;
 use Severity\ConfigLoader\Exceptions\NotExistingPathSegmentException;
-use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
+use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 
 /**
  * Class ConfigMapTest
  *
  * @covers \Severity\ConfigLoader\Builder\ConfigMap
+ * @covers \Severity\ConfigLoader\Resolver\ResolveContext
  */
 class ConfigMapTest extends ConfigLoaderTestCase
 {

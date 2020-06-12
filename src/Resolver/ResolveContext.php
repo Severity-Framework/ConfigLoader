@@ -17,20 +17,18 @@ class ResolveContext
 
     public function __construct(ConfigMap $configMap, array $path = [])
     {
-        $this->configMap = $configMap;
+        $this->configMap   = $configMap;
         $this->currentPath = $path;
     }
 
-    public function get(string $path, $default = null)
+    public function get(string $path)
     {
-        $config = $this->configMap->getByPath('parameters.' . $path);
-
-        return $config;
+        return $this->configMap->getByPath('parameters.' . $path);
     }
 
     public function exists(string $path): bool
     {
-        return $this->configMap->exists($path);
+        return $this->configMap->exists('parameters.' . $path);
     }
 
     public function getCurrentPath(): array
@@ -46,10 +44,5 @@ class ResolveContext
     public function pop(): void
     {
         array_pop($this->currentPath);
-    }
-
-    public function update(array $path)
-    {
-        return new static($this->configMap, $path);
     }
 }
