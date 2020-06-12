@@ -3,6 +3,7 @@
 namespace Severity\ConfigLoader\Builder;
 
 use InvalidArgumentException;
+use function yaml_parse_file;
 
 class ConfigFile
 {

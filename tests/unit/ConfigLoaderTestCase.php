@@ -16,7 +16,7 @@ class ConfigLoaderTestCase extends TestCase
         self::$cwd = dirname(__DIR__) . '/';
     }
 
-    public function getFixturePath(string $path): string
+    public static function getFixturePath(string $path): string
     {
         return self::$cwd . "fixtures/$path";
     }

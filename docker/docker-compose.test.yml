@@ -1,0 +1,4 @@
+version: '3'
+services:
+    config-loader:
+        command: [ "php", "vendor/bin/phpunit" ]

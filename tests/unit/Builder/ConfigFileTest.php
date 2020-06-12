@@ -5,6 +5,9 @@ namespace Severity\ConfigLoader\Tests\Unit\Builder;
 use InvalidArgumentException;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
+use function chmod;
+use function fileperms;
+use function var_dump;
 
 /**
  * Class ConfigFileTest
@@ -13,6 +16,39 @@ use Severity\ConfigLoader\Tests\Unit\ConfigLoaderTestCase;
  */
 class ConfigFileTest extends ConfigLoaderTestCase
 {
+    public static function getFiles(): array
+    {
+        return glob(self::getFixturePath('Builder/ConfigFile/unreadable_*.yaml'));
+    }
+
+    /**
+     * Sets fixture files - prefixed with unreadable - to 0000 permission.
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        foreach (self::getFiles() as $file) {
+            chmod($file, 0000);
+        }
+    }
+
+    /**
+     * Sets fixture files - prefixed with unreadable - back to 0644 permission.
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        foreach (self::getFiles() as $file) {
+            chmod($file, 0644);
+        }
+    }
+
     /**
      * Tests {@see ConfigFile::__construct()}
      *
@@ -20,7 +56,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testConstructorForNotExistingFile(): void
     {
-        $filePath = $this->getFixturePath('not/existing/file.yaml');
+        $filePath = self::getFixturePath('not/existing/file.yaml');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(does not exist)/');
@@ -34,7 +70,9 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testConstructorForNotReadable(): void
     {
-        $filePath = $this->getFixturePath('Builder/ConfigFile/unreadable_example.yaml');
+        $filePath = self::getFixturePath('Builder/ConfigFile/unreadable_example.yaml');
+
+        chmod($filePath, 0000);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(is not readable)/');
@@ -49,7 +87,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testFetchWithValidContent(): void
     {
-        $filePath = $this->getFixturePath('Builder/ConfigFile/valid_example1.yaml');
+        $filePath = self::getFixturePath('Builder/ConfigFile/valid_example1.yaml');
 
         $configFile = new ConfigFile($filePath);
 
@@ -69,7 +107,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testPath(): void
     {
-        $testPath = $this->getFixturePath('Builder/ConfigFile/valid_example1.yaml');
+        $testPath = self::getFixturePath('Builder/ConfigFile/valid_example1.yaml');
 
         $mockFile = new ConfigFile($testPath);
 
