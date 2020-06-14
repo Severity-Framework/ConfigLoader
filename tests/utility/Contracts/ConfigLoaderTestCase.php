@@ -21,6 +21,11 @@ class ConfigLoaderTestCase extends TestCase
         return self::$cwd . "fixtures/$path";
     }
 
+    public static function getCachePath(string $path): string
+    {
+        return self::$cwd . "cache/$path";
+    }
+
     /**
      * @param mixed $returnValue
      *

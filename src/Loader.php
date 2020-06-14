@@ -5,6 +5,7 @@ namespace Severity\ConfigLoader;
 use InvalidArgumentException;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Builder\ConfigMap;
+use Severity\ConfigLoader\Cache\CacheLoader;
 use Severity\ConfigLoader\Resolver\ParameterResolver;
 use function var_dump;
 
@@ -22,6 +23,11 @@ class Loader
      */
     protected array $configFiles = [];
 
+    /**
+     * Loader constructor.
+     *
+     * @param string $cachePath The given folder is gonna be used as a cache folder.
+     */
     public function __construct(string $cachePath)
     {
         if (is_dir($cachePath) === false) {
@@ -36,6 +42,11 @@ class Loader
         $this->resolveManager = $this->configureResolver();
     }
 
+    /**
+     * Sets up default resolvers.
+     *
+     * @return ResolveManager
+     */
     private function configureResolver(): ResolveManager
     {
         $resolver = new ResolveManager();
@@ -45,29 +56,53 @@ class Loader
         return $resolver;
     }
 
+    /**
+     * Adds the given path to the list of configuration files to be loaded.
+     *
+     * @param string $path
+     *
+     * @return void
+     */
     public function loadConfig(string $path): void
     {
         $this->configFiles[] = new ConfigFile($path);
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
     public function export(): array
     {
-        if ($this->shouldGenerate() === false) {
-            return $this->returnFromCache();
+        $cacheConfiguration = new CacheLoader($this->configFiles, $this->cachePath);
+
+        if ($cacheConfiguration->shouldGenerate() === false) {
+            return $cacheConfiguration->fetchCache();
         }
 
         $config = $this->generate();
 
-//        $this->storeConfig($config);
+        $cacheConfiguration->store($config);
 
         return $config;
     }
 
+    /**
+     * Decides whether, for the given list of configuration files a new cache should file be generated.
+     *
+     * @return bool
+     */
     protected function shouldGenerate(): bool
     {
         return true;
     }
 
+    /**
+     *
+     *
+     * @return mixed[]
+     */
     protected function returnFromCache(): array
     {
 
