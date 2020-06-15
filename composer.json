@@ -22,5 +22,11 @@
             "Severity\\ConfigLoader\\Tests\\Unit\\": "tests/unit",
             "Severity\\ConfigLoader\\Tests\\Utility\\": "tests/utility"
         }
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "ext-yaml": "2.2.1"
+        }
     }
 }

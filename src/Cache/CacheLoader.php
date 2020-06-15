@@ -87,7 +87,7 @@ class CacheLoader
 
     public function fetchCache(): array
     {
-        if ($this->valid === false) {
+        if ($this->valid === false || $this->valid === null) {
             throw new BadMethodCallException('The cache is not valid!');
         }
 
@@ -104,6 +104,8 @@ class CacheLoader
     {
         file_put_contents($this->fullPath . self::EXT_CACHE, serialize($config));
         file_put_contents($this->fullPath . self::EXT_META, $this->generateMeta());
+
+        return $this->fullPath . self::EXT_CACHE;
     }
 
     protected function generateMeta(): string

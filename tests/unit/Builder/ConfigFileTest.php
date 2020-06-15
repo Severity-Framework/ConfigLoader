@@ -28,6 +28,8 @@ class ConfigFileTest extends ConfigLoaderTestCase
     {
         parent::setUpBeforeClass();
 
+        umask(0000);
+
         foreach (self::getFiles() as $file) {
             chmod($file, 0000);
         }
@@ -69,8 +71,6 @@ class ConfigFileTest extends ConfigLoaderTestCase
     public function testConstructorForNotReadable(): void
     {
         $filePath = self::getFixturePath('Builder/ConfigFile/unreadable_example.yaml');
-
-        chmod($filePath, 0000);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(is not readable)/');
