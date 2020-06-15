@@ -27,8 +27,6 @@ class CacheLoader
      */
     protected array $files;
 
-    protected string $cachePath;
-
     protected string $fullPath;
 
     protected ?bool $valid = null;
@@ -41,29 +39,27 @@ class CacheLoader
      */
     public function __construct(array $files, string $cachePath)
     {
-        $this->files     = $files;
-        $this->cachePath = $cachePath;
+        $this->files    = $files;
+        // @todo find a little bit more elegant way
+        $this->fullPath = $cachePath . $this->generateCacheKey();
     }
 
     public function shouldGenerate(): bool
     {
         if ($this->valid === null) {
-            $cacheKey       = $this->generateCacheKey();
-            // @todo find a little bit more elegant way
-            $this->fullPath = $this->cachePath . $cacheKey;
-
             $this->valid = false;
-            if ($this->cacheFileExists($this->fullPath)) {
-                $this->valid = $this->isDeprecated($this->fullPath) === false;
+            if ($this->cacheFileExists()) {
+                $this->valid = $this->isDeprecated() === false;
             }
         }
 
         return $this->valid === false;
     }
-    protected function cacheFileExists(string $path): bool
+
+    protected function cacheFileExists(): bool
     {
-        return file_exists($path . self::EXT_CACHE) &&
-               file_exists($path . self::EXT_META);
+        return file_exists($this->fullPath . self::EXT_CACHE) &&
+               file_exists($this->fullPath . self::EXT_META);
     }
 
     protected function generateCacheKey(): string
@@ -75,12 +71,12 @@ class CacheLoader
         return substr((string) crc32($base), 0, 16);
     }
 
-    protected function isDeprecated(string $fullPath): bool
+    protected function isDeprecated(): bool
     {
-        $cacheCreateDate = filemtime($fullPath . self::EXT_CACHE);
+        $cacheCreateDate = filemtime($this->fullPath . self::EXT_CACHE);
 
         /** @noinspection PhpIncludeInspection Method {@see cacheFileExists()} should be called before. */
-        $files = (require $fullPath . self::EXT_META);
+        $files = (require $this->fullPath . self::EXT_META);
 
         foreach ($files as $file) {
             if (filemtime($file) > $cacheCreateDate) return true;
@@ -104,7 +100,7 @@ class CacheLoader
         return unserialize($cacheContent);
     }
 
-    public function store(array $config): void
+    public function store(array $config): string
     {
         file_put_contents($this->fullPath . self::EXT_CACHE, serialize($config));
         file_put_contents($this->fullPath . self::EXT_META, $this->generateMeta());
