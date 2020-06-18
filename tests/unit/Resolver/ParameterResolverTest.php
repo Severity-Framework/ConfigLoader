@@ -23,6 +23,19 @@ class ParameterResolverTest extends ConfigLoaderTestCase
         $this->resolver = new ParameterResolver();
     }
 
+    protected function mockResolveContext(array $arguments): ResolveContext
+    {
+        $contextMock = $this->createMock(ResolveContext::class);
+        foreach ($arguments as $key => $argument) {
+            $contextMock->expects($this->at($key))
+                        ->method('get')
+                        ->with($argument['arg'])
+                        ->willReturn($argument['return']);
+        }
+
+        return $contextMock;
+    }
+
     /**
      * Provider for {@see testTranslateNotMatching()} method.
      *
@@ -34,9 +47,9 @@ class ParameterResolverTest extends ConfigLoaderTestCase
             ['not.matching',      'not.matching',      []],
             ['not-\%1.matching',  'not-\%1.matching',  []],
             ['not-%1.matching',   'not-%1.matching',   []],
-            ['not[matching]',     'not[matching]',     []],
-            ['not[matching-%1]',  'not[matching-%1]',  []],
-            ['not[matching-\%1]', 'not[matching-\%1]', []],
+            ['not>>matching',     'not>>matching',     []],
+            ['not>>matching-%1',  'not>>matching-%1',  []],
+            ['not>>matching-\%1', 'not>>matching-\%1', []],
         ];
     }
 
@@ -57,25 +70,12 @@ class ParameterResolverTest extends ConfigLoaderTestCase
         $this->assertSame($expected, $this->resolver->translate($value, $context));
     }
 
-    protected function mockResolveContext(array $arguments): ResolveContext
-    {
-        $contextMock = $this->createMock(ResolveContext::class);
-        foreach ($arguments as $key => $argument) {
-            $contextMock->expects($this->at($key))
-                        ->method('get')
-                        ->with($argument['arg'])
-                        ->willReturn($argument['return']);
-        }
-
-        return $contextMock;
-    }
-
     /**
      * Provider for {@see testTranslateMatchingSimple()} method.
      *
      * @return string[][]
      */
-    public function translateNotMatchingSimpleProvider(): array
+    public function translateMatchingSimpleProvider(): array
     {
         return [
             [
@@ -139,7 +139,7 @@ class ParameterResolverTest extends ConfigLoaderTestCase
     /**
      * Tests {@see ParameterResolver::translate()} method.
      *
-     * @dataProvider translateNotMatchingSimpleProvider()
+     * @dataProvider translateMatchingSimpleProvider()
      *
      * @param string         $value
      * @param string         $expected
@@ -157,18 +157,18 @@ class ParameterResolverTest extends ConfigLoaderTestCase
      *
      * @return string[][]
      */
-    public function translateNotMatchingAssocArrayProvider(): array
+    public function translateMatchingAssocArrayProvider(): array
     {
         return [
             [
-                'param-%param[bar]%', 'param-baz',
+                'param-%param>>bar%', 'param-baz',
                 $this->mockResolveContext([[
                     'arg'    => 'param.bar',
                     'return' => 'baz'
                 ]])
             ],
             [
-                'param-%param[bar][foo]%', 'param-baz',
+                'param-%param>>bar>>foo%', 'param-baz',
                 $this->mockResolveContext([[
                     'arg'    => 'param.bar.foo',
                     'return' => 'baz'
@@ -180,7 +180,7 @@ class ParameterResolverTest extends ConfigLoaderTestCase
     /**
      * Tests {@see ParameterResolver::translate()} method.
      *
-     * @dataProvider translateNotMatchingAssocArrayProvider()
+     * @dataProvider translateMatchingAssocArrayProvider()
      *
      * @param string         $value
      * @param string         $expected

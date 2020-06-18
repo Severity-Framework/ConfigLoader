@@ -10,13 +10,14 @@ use function strlen;
 use function strpos;
 use function substr;
 use function substr_replace;
+use function var_dump;
 use const PREG_OFFSET_CAPTURE;
 
 class ParameterResolver implements ResolverInterface
 {
     public function translate(string $parameterValue, ResolveContext $context)
     {
-        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9\-_\[\]\.]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
+        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9\-_>\.]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
             return $this->doReplace($parameterValue, $matches, $context);
         }
 
@@ -30,13 +31,8 @@ class ParameterResolver implements ResolverInterface
             $length = strlen($match);
             $match = substr(str_replace('\%', '%', $match), 1, -1);
 
-            if (preg_match('/^(?P<var>[a-zA-Z0-9\-\._%]+)(?:\[(\g<var>)\])+$/', $match) === 1) {
-                $firstComponentPos = strpos($match, '[');
-                $firstPart = substr($match, 0, $firstComponentPos);
-
-                $rest = str_replace('][', '.', substr($match, $firstComponentPos + 1, -1));
-
-                $match = "{$firstPart}.{$rest}";
+            if (preg_match('/^(?P<var>[a-zA-Z0-9\-\._%]+)(?:>>(\g<var>))+$/', $match) === 1) {
+                $match = str_replace('>>', '.', $match);
             }
 
             $resolved = $context->get($match);
