@@ -12,14 +12,14 @@ trait VisibilityHelper
      * @param string $propertyName
      * @param mixed  $data
      *
-     * @throws ReflectionException
-     *
      * @return void
      */
     protected function setProperty($obj, string $propertyName, $data): void
     {
+        /** @noinspection PhpUnhandledExceptionInspection The class does exist */
         $class = new ReflectionClass($obj);
 
+        /** @noinspection PhpUnhandledExceptionInspection That property does exist */
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
 
@@ -30,14 +30,14 @@ trait VisibilityHelper
      * @param object $obj
      * @param string $propertyName
      *
-     * @throws ReflectionException
-     *
      * @return mixed
      */
     protected function getProperty($obj, string $propertyName)
     {
+        /** @noinspection PhpUnhandledExceptionInspection The class does exist */
         $class = new ReflectionClass($obj);
 
+        /** @noinspection PhpUnhandledExceptionInspection That property does exist */
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
 
