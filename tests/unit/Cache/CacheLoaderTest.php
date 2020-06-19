@@ -5,24 +5,20 @@ namespace Severity\ConfigLoader\Tests\Unit\Cache;
 use BadMethodCallException;
 use DateTime;
 use Exception;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Cache\CacheLoader;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
-use function chmod;
 use function crc32;
-use function file_exists;
 use function file_put_contents;
-use function is_readable;
-use function is_writable;
-use function mkdir;
-use function sprintf;
+use function serialize;
+use function strrpos;
 use function substr;
-use function touch;
-use function umask;
-use function var_dump;
+use function time;
 
 /**
  * Class CacheConfigurationTest
@@ -33,41 +29,12 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 {
     use VisibilityHelper;
 
-    public static function setUpBeforeClass(): void
+    protected vfsStreamDirectory $path;
+
+    protected function setUp(): void
     {
-        parent::setUpBeforeClass();
-
-        umask(0000);
-
-        $cachePath = self::getCachePath('');
-
-        if (is_dir($cachePath) === false) {
-            mkdir($cachePath, 0777);
-        } else {
-            if (is_writable($cachePath) === false) {
-                throw new RuntimeException(sprintf('Path "%s" is not writable!', $cachePath));
-            }
-
-            if (is_readable($cachePath) === false) {
-                throw new RuntimeException(sprintf('Path "%s" is not readable!', $cachePath));
-            }
-
-            if (file_exists($cachePath) === false) {
-                throw new RuntimeException(sprintf('Path "%s" already exists, but it has to be a directory!', $cachePath));
-            }
-
-        }
+        $this->path = vfsStream::setup();
     }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
-
-        foreach (glob(self::getCachePath('*.*')) as $file) {
-            unlink($file);
-        }
-    }
-
 
     /**
      * @param string $path
@@ -93,7 +60,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
      */
     public function testConstructWithEmpty(): void
     {
-        $config = new CacheLoader([], '');
+        $config = new CacheLoader([], $this->path->url() . '/cache');
 
         $property = $this->getProperty($config, 'files');
 
@@ -111,7 +78,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
         $config = new CacheLoader([
             $configFileMock
-        ], '');
+        ], $this->path->url() . '/cache');
 
         $property = $this->getProperty($config, 'files');
 
@@ -134,10 +101,11 @@ class CacheLoaderTest extends ConfigLoaderTestCase
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_a.yaml');
-        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
+        $configFilePathA = 'config/example_a.yaml';
+        $mockA = $this->mockFile($configFilePathA, null, (new DateTime('-2 hours'))->getTimestamp());
 
-        touch($configFilePathA, (new DateTime('-2 hours'))->getTimestamp());
+        $configFilePathA = $mockA->url();
+        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
         $configContentB  = [
@@ -148,28 +116,27 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_b.yaml');
-        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
+        $configFilePathB = 'config/example_b.yaml';
+        $mockB = $this->mockFile($configFilePathB, null, (new DateTime('-1 hours -31 minutes'))->getTimestamp());
 
-        touch($configFilePathB, (new DateTime('-1 hours -31 minutes'))->getTimestamp());
+        $configFilePathB = $mockB->url();
+        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="Mock cache file">
         // @todo: introduce a cache key generation policy class
-        $cacheFileKey = substr((string) crc32($configFilePathA . $configFilePathB), 0, 16);
+        $cacheFileKey = substr((string) crc32($mockA->url() . $mockB->url()), 0, 16);
 
-        // @todo: would it be faster as plain lines?
         $cacheContent = "<?php return [
             '{$configFileMockA->getPath()}',
             '{$configFileMockB->getPath()}'
         ];";
 
-        // Create cache file
-        file_put_contents($this->getCachePath("{$cacheFileKey}.cache.properties"), $cacheContent);
+        $this->mockFile("cache/{$cacheFileKey}.cache.properties", $cacheContent);
+        $this->mockFile("cache/{$cacheFileKey}.cache", null, time());
         //</editor-fold>
-        touch($this->getCachePath("{$cacheFileKey}.cache"));
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->getCachePath(''));
+        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
 
         $this->assertFalse($config->shouldGenerate());
     }
@@ -189,10 +156,11 @@ class CacheLoaderTest extends ConfigLoaderTestCase
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithGeneration/example_a.yaml');
-        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
+        $configFilePathA = 'config/example_c.yaml';
+        $mockA = $this->mockFile($configFilePathA, null, (new DateTime('-4 seconds'))->getTimestamp());
 
-        touch($configFilePathA, (new DateTime('-4 seconds'))->getTimestamp());
+        $configFilePathA = $mockA->url();
+        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
         $configContentB  = [
@@ -203,28 +171,28 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithGeneration/example_b.yaml');
-        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
+        $configFilePathB = 'config/example_d.yaml';
+        $mockB = $this->mockFile($configFilePathB, null, (new DateTime('-1 minutes'))->getTimestamp());
 
-        touch($configFilePathB, (new DateTime('-1 minutes'))->getTimestamp());
+        $configFilePathB = $mockB->url();
+        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="Mock cache file">
         // @todo: introduce a cache key generation policy class
-        $cacheFileKey = substr((string) crc32($configFilePathA . $configFilePathB), 0, 16);
+        $cacheFileKey = substr((string) crc32($mockA->url() . $mockB->url()), 0, 16);
 
-        // @todo: would it be faster as plain lines?
         $cacheContent = "<?php return [
             '{$configFileMockA->getPath()}',
             '{$configFileMockB->getPath()}'
         ];";
 
         // Create cache file
-        file_put_contents($this->getCachePath("{$cacheFileKey}.cache.properties"), $cacheContent);
+        $this->mockFile("cache/{$cacheFileKey}.cache.properties", $cacheContent);
+        $this->mockFile("cache/{$cacheFileKey}.cache", null, (new DateTime('-1hours -31 minutes'))->getTimestamp());
         //</editor-fold>
-        touch($this->getCachePath("{$cacheFileKey}.cache"), (new DateTime('-1hours -31 minutes'))->getTimestamp());
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->getCachePath(''));
+        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
         $this->assertTrue($config->shouldGenerate());
     }
 
@@ -243,10 +211,11 @@ class CacheLoaderTest extends ConfigLoaderTestCase
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheLoader/Fetch/example_a.yaml');
-        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
+        $configFilePathA = 'config/example_e.yaml';
+        $mockA = $this->mockFile($configFilePathA, null, (new DateTime('-4 seconds'))->getTimestamp());
 
-        touch($configFilePathA, (new DateTime('-4 seconds'))->getTimestamp());
+        $configFilePathA = $mockA->url();
+        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
         $configContentB  = [
@@ -257,13 +226,16 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheLoader/Fetch/example_b.yaml');
-        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
+        $configFilePathB = 'config/example_f.yaml';
+        $mockB = $this->mockFile($configFilePathB, null, (new DateTime('-1 minutes'))->getTimestamp());
 
-        touch($configFilePathB, (new DateTime('-1 minutes'))->getTimestamp());
+        $configFilePathB = $mockB->url();
+        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
+        //<editor-fold defaultstate="collapsed" desc="Mock cache file">
         $cacheFileKey = substr((string) crc32($configFilePathA . $configFilePathB), 0, 16);
+        // @todo: introduce a cache key generation policy class
 
         $cacheContent = [
             'parameters' => [
@@ -275,10 +247,12 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         ];
 
         file_put_contents($this->getCachePath("{$cacheFileKey}.cache"), serialize($cacheContent));
+        $this->mockFile("cache/{$cacheFileKey}.cache", serialize($cacheContent));
+        //</editor-fold>
 
         /** @var CacheLoader|MockObject $config */
         $config = $this->getMockBuilder(CacheLoader::class)
-                       ->setConstructorArgs([[$configFileMockA, $configFileMockB], $this->getCachePath('')])
+                       ->setConstructorArgs([[$configFileMockA, $configFileMockB], $this->path->url() . '/cache/'])
                        ->onlyMethods(['shouldGenerate'])
                        ->getMock();
 
@@ -304,10 +278,11 @@ class CacheLoaderTest extends ConfigLoaderTestCase
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_a.yaml');
-        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
+        $configFilePathA = 'config/example_g.yaml';
+        $mockA = $this->mockFile($configFilePathA, null, (new DateTime('-4 seconds'))->getTimestamp());
 
-        touch($configFilePathA, (new DateTime('-4 seconds'))->getTimestamp());
+        $configFilePathA = $mockA->url();
+        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
         $configContentB  = [
@@ -318,13 +293,14 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_b.yaml');
-        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
+        $configFilePathB = 'config/example_h.yaml';
+        $mockB = $this->mockFile($configFilePathB, null, (new DateTime('-1 minutes'))->getTimestamp());
 
-        touch($configFilePathB, (new DateTime('-1 minutes'))->getTimestamp());
+        $configFilePathB = $mockB->url();
+        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->getCachePath(''));
+        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
 
         $this->expectException(BadMethodCallException::class);
         $config->fetchCache();
@@ -333,18 +309,19 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     public function testFetchCacheWithNoPermission(): void
     {
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock A">
-        $configContentA = [
+        $configContentA  = [
             'parameters' => [
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_a.yaml');
-        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
+        $configFilePathA = 'config/example_i.yaml';
+        $mockA = $this->mockFile($configFilePathA, null, (new DateTime('-4 seconds'))->getTimestamp());
 
-        touch($configFilePathA, (new DateTime('-4 seconds'))->getTimestamp());
+        $configFilePathA = $mockA->url();
+        $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
-        $configContentB = [
+        $configContentB  = [
             'parameters' => [
                 'bar' => 'foo'
             ],
@@ -352,20 +329,25 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheLoader/ShouldGenerateWithNoGeneration/example_b.yaml');
-        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
+        $configFilePathB = 'config/example_j.yaml';
+        $mockB = $this->mockFile($configFilePathB, null, (new DateTime('-1 minutes'))->getTimestamp());
 
-        touch($configFilePathB, (new DateTime('-1 minutes'))->getTimestamp());
+        $configFilePathB = $mockB->url();
+        $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->getCachePath(''));
-
+        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
         $this->setProperty($config, 'valid', true);
 
         /** @var string $cachePath */
         $cachePath = $this->getProperty($config, 'fullPath');
 
-        chmod("{$cachePath}.cache", 0000);
+        //<editor-fold defaultstate="collapsed" desc="Mock cache file">
+        $cacheKey = substr($cachePath, strrpos($cachePath, '/') + 1);
+
+        $mockFile = $this->mockFile("cache/{$cacheKey}.cache");
+        $mockFile->chmod(0000);
+        //</editor-fold>
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/(Check permissions)/');
@@ -387,7 +369,10 @@ class CacheLoaderTest extends ConfigLoaderTestCase
                 'foo' => 'baz'
             ]
         ];
-        $configFilePathA = self::getFixturePath('Cache/CacheConfigurator/ShouldGenerateWithNoGeneration/example_c.yaml');
+        $configFilePathA = 'config/example_k.yaml';
+        $mockA = $this->mockFile($configFilePathA);
+
+        $configFilePathA = $mockA->url();
         $configFileMockA = $this->mockConfigFile($configFilePathA, $configContentA);
         //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Create ConfigFile mock B">
@@ -399,7 +384,10 @@ class CacheLoaderTest extends ConfigLoaderTestCase
 
             ]
         ];
-        $configFilePathB = self::getFixturePath('Cache/CacheConfigurator/ShouldGenerateWithNoGeneration/example_d.yaml');
+        $configFilePathB = 'config/example_l.yaml';
+        $mockB = $this->mockFile($configFilePathB);
+
+        $configFilePathB = $mockB->url();
         $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 

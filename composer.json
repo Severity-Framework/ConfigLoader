@@ -10,6 +10,7 @@
       "ext-yaml": "*"
     },
     "require-dev": {
+        "mikey179/vfsstream": "^1.6",
         "phpunit/phpunit": "^9.1"
     },
     "autoload": {

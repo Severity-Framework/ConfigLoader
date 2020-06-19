@@ -2,12 +2,10 @@
 
 namespace Severity\ConfigLoader;
 
-use InvalidArgumentException;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Cache\CacheLoader;
 use Severity\ConfigLoader\Resolver\ParameterResolver;
-use function var_dump;
 
 class Loader
 {
@@ -26,19 +24,10 @@ class Loader
     /**
      * Loader constructor.
      *
-     * @param string $cachePath The given folder is gonna be used as a cache folder.
+     * @param LoaderConfiguration $config
      */
-    public function __construct(string $cachePath)
+    public function __construct(LoaderConfiguration $config)
     {
-        if (is_dir($cachePath) === false) {
-            throw new InvalidArgumentException(sprintf('Given cache path "%s" does not exist!', $cachePath));
-        }
-        if (is_writable($cachePath) === false) {
-            throw new InvalidArgumentException(sprintf('Given cache path "%s" is not writable!', $cachePath));
-        }
-
-        $this->cachePath = rtrim($cachePath, '\\') . '\\';
-
         $this->resolveManager = $this->configureResolver();
     }
 

@@ -2,7 +2,11 @@
 
 namespace Severity\ConfigLoader;
 
+use InvalidArgumentException;
+use function is_dir;
+use function is_writable;
 use function rtrim;
+use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
 class LoaderConfiguration
@@ -24,6 +28,16 @@ class LoaderConfiguration
         if ($cachePath !== null) {
             $this->cachePath = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         }
+
+        if (is_dir($cachePath) === false) {
+            throw new InvalidArgumentException(sprintf('Given cache path "%s" does not exist!', $cachePath));
+        }
+        if (is_writable($cachePath) === false) {
+            throw new InvalidArgumentException(sprintf('Given cache path "%s" is not writable!', $cachePath));
+        }
+
+        $this->cachePath = rtrim($cachePath, '\\') . '\\';
+
     }
 
     /**

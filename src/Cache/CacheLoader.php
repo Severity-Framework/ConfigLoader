@@ -9,15 +9,18 @@ use Severity\ConfigLoader\Builder\ConfigFile;
 use function array_map;
 use function array_reduce;
 use function crc32;
+use function dirname;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function filemtime;
 use function is_readable;
+use function scandir;
 use function serialize;
 use function sprintf;
 use function substr;
 use function unserialize;
+use function var_dump;
 
 class CacheLoader
 {
