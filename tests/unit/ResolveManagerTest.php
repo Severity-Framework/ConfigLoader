@@ -11,6 +11,11 @@ use Severity\ConfigLoader\Resolver\ResolveContext;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
 
+/**
+ * Class ResolveManagerTest
+ *
+ * @covers \Severity\ConfigLoader\ResolveManager
+ */
 class ResolveManagerTest extends ConfigLoaderTestCase
 {
     use VisibilityHelper;
@@ -30,8 +35,6 @@ class ResolveManagerTest extends ConfigLoaderTestCase
     /**
      * Test {@see ResolveManager::__constructor()} method.
      *
-     * @throws ReflectionException
-     *
      * @return void
      */
     public function testConstructor(): void
@@ -41,8 +44,6 @@ class ResolveManagerTest extends ConfigLoaderTestCase
 
     /**
      * Test {@see ResolveManager::pushResolver()} method.
-     *
-     * @throws ReflectionException
      *
      * @return void
      */

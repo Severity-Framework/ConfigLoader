@@ -10,7 +10,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 use Severity\ConfigLoader\Builder\ConfigFile;
-use Severity\ConfigLoader\Cache\CacheLoader;
+use Severity\ConfigLoader\Cache\CacheStrategy;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
 use function crc32;
@@ -23,9 +23,9 @@ use function time;
 /**
  * Class CacheConfigurationTest
  *
- * @covers \Severity\ConfigLoader\Cache\CacheLoader
+ * @covers \Severity\ConfigLoader\Cache\CacheStrategy
  */
-class CacheLoaderTest extends ConfigLoaderTestCase
+class CacheStrategyTest extends ConfigLoaderTestCase
 {
     use VisibilityHelper;
 
@@ -54,13 +54,13 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see CacheLoader::__construct()} with empty file list.
+     * Tests {@see CacheStrategy::__construct()} with empty file list.
      *
      * @return void
      */
     public function testConstructWithEmpty(): void
     {
-        $config = new CacheLoader([], $this->path->url() . '/cache');
+        $config = new CacheStrategy([], $this->path->url() . '/cache');
 
         $property = $this->getProperty($config, 'files');
 
@@ -68,7 +68,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see CacheLoader::__construct()} with non-empty file list.
+     * Tests {@see CacheStrategy::__construct()} with non-empty file list.
      *
      * @return void
      */
@@ -76,7 +76,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     {
         $configFileMock = $this->mockConfigFileWithPath('SomePath');
 
-        $config = new CacheLoader([
+        $config = new CacheStrategy([
             $configFileMock
         ], $this->path->url() . '/cache');
 
@@ -87,7 +87,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see CacheLoader::shouldGenerate()} method.
+     * Tests {@see CacheStrategy::shouldGenerate()} method.
      *
      * @throws Exception
      *
@@ -136,13 +136,13 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         $this->mockFile("cache/{$cacheFileKey}.cache", null, time());
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
+        $config = new CacheStrategy([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
 
         $this->assertFalse($config->shouldGenerate());
     }
 
     /**
-     * Tests {@see CacheLoader::shouldGenerate()} method.
+     * Tests {@see CacheStrategy::shouldGenerate()} method.
      *
      * @throws Exception
      *
@@ -192,12 +192,12 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         $this->mockFile("cache/{$cacheFileKey}.cache", null, (new DateTime('-1hours -31 minutes'))->getTimestamp());
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
+        $config = new CacheStrategy([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
         $this->assertTrue($config->shouldGenerate());
     }
 
     /**
-     * Tests {@see CacheLoader::fetchCache()} method.
+     * Tests {@see CacheStrategy::fetchCache()} method.
      *
      * @throws Exception
      *
@@ -250,8 +250,8 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         $this->mockFile("cache/{$cacheFileKey}.cache", serialize($cacheContent));
         //</editor-fold>
 
-        /** @var CacheLoader|MockObject $config */
-        $config = $this->getMockBuilder(CacheLoader::class)
+        /** @var CacheStrategy|MockObject $config */
+        $config = $this->getMockBuilder(CacheStrategy::class)
                        ->setConstructorArgs([[$configFileMockA, $configFileMockB], $this->path->url() . '/cache/'])
                        ->onlyMethods(['shouldGenerate'])
                        ->getMock();
@@ -264,7 +264,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see CacheLoader::fetchCache()} method.
+     * Tests {@see CacheStrategy::fetchCache()} method.
      *
      * @throws Exception
      *
@@ -300,7 +300,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
+        $config = new CacheStrategy([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
 
         $this->expectException(BadMethodCallException::class);
         $config->fetchCache();
@@ -336,7 +336,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
         $configFileMockB = $this->mockConfigFile($configFilePathB, $configContentB);
         //</editor-fold>
 
-        $config = new CacheLoader([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
+        $config = new CacheStrategy([$configFileMockA, $configFileMockB], $this->path->url() . '/cache/');
         $this->setProperty($config, 'valid', true);
 
         /** @var string $cachePath */
@@ -355,7 +355,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see CacheLoader::store()} method.
+     * Tests {@see CacheStrategy::store()} method.
      *
      * @throws Exception
      *
@@ -399,7 +399,7 @@ class CacheLoaderTest extends ConfigLoaderTestCase
             'services' => [],
         ];
 
-        $loader = new CacheLoader([$configFileMockA, $configFileMockB], $this->getCachePath(''));
+        $loader = new CacheStrategy([$configFileMockA, $configFileMockB], $this->getCachePath(''));
         $path = $loader->store($newConfiguration);
 
         $this->assertFileExists("{$path}");

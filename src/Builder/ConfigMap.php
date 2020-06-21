@@ -12,6 +12,11 @@ use function is_array;
 use function is_int;
 use function sprintf;
 
+/**
+ * Class ConfigMap
+ *
+ * @internal
+ */
 class ConfigMap
 {
     protected array $configuration;

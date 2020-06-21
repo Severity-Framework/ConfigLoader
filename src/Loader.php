@@ -4,8 +4,7 @@ namespace Severity\ConfigLoader;
 
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Builder\ConfigMap;
-use Severity\ConfigLoader\Cache\CacheLoader;
-use Severity\ConfigLoader\Resolver\ParameterResolver;
+use Severity\ConfigLoader\Cache\CacheStrategy;
 
 class Loader
 {
@@ -24,47 +23,32 @@ class Loader
     /**
      * Loader constructor.
      *
-     * @param LoaderConfiguration $config
+     * @param ResolveManager $resolveManager
+     * @param string         $cachePath
      */
-    public function __construct(LoaderConfiguration $config)
-    {
-        $this->resolveManager = $this->configureResolver();
-    }
-
-    /**
-     * Sets up default resolvers.
-     *
-     * @return ResolveManager
-     */
-    private function configureResolver(): ResolveManager
-    {
-        $resolver = new ResolveManager();
-
-        $resolver->pushResolver(new ParameterResolver());
-
-        return $resolver;
+    public function __construct(
+        ResolveManager $resolveManager,
+        string $cachePath
+    ) {
+        $this->resolveManager = $resolveManager;
+        $this->cachePath      = $cachePath;
     }
 
     /**
      * Adds the given path to the list of configuration files to be loaded.
      *
-     * @param string $path
+     * @param ConfigFile $configFile
      *
      * @return void
      */
-    public function loadConfig(string $path): void
+    public function loadConfig(ConfigFile $configFile): void
     {
-        $this->configFiles[] = new ConfigFile($path);
+        $this->configFiles[] = $configFile;
     }
 
-    /**
-     *
-     *
-     * @return mixed
-     */
     public function export(): array
     {
-        $cacheConfiguration = new CacheLoader($this->configFiles, $this->cachePath);
+        $cacheConfiguration = new CacheStrategy($this->configFiles, $this->cachePath);
 
         if ($cacheConfiguration->shouldGenerate() === false) {
             return $cacheConfiguration->fetchCache();
@@ -75,26 +59,6 @@ class Loader
         $cacheConfiguration->store($config);
 
         return $config;
-    }
-
-    /**
-     * Decides whether, for the given list of configuration files a new cache should file be generated.
-     *
-     * @return bool
-     */
-    protected function shouldGenerate(): bool
-    {
-        return true;
-    }
-
-    /**
-     *
-     *
-     * @return mixed[]
-     */
-    protected function returnFromCache(): array
-    {
-
     }
 
     protected function generate(): array
