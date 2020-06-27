@@ -5,6 +5,7 @@ namespace Severity\ConfigLoader\Resolver;
 use Severity\ConfigLoader\Builder\ConfigMap;
 use function array_pop;
 use function array_push;
+use function var_dump;
 
 class ResolveContext
 {
@@ -21,14 +22,14 @@ class ResolveContext
         $this->currentPath = $path;
     }
 
-    public function get(string $path)
+    public function get(string $path, string $delimiter)
     {
-        return $this->configMap->getByPath('parameters.' . $path);
+        return $this->configMap->getByPath("parameters{$delimiter}" . $path, $delimiter);
     }
 
-    public function exists(string $path): bool
+    public function exists(string $path, string $delimiter): bool
     {
-        return $this->configMap->exists('parameters.' . $path);
+        return $this->configMap->exists("parameters{$delimiter}" . $path);
     }
 
     public function getCurrentPath(): array

@@ -6,9 +6,11 @@ use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Loader;
 use PHPUnit\Framework\TestCase;
 use Severity\ConfigLoader\ResolveManager;
+use Severity\ConfigLoader\Resolver\ParameterResolver;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
 use function array_shift;
+use function var_dump;
 
 /**
  * Class LoaderTest
@@ -41,5 +43,19 @@ class LoaderTest extends ConfigLoaderTestCase
         $configFile = array_shift($configFiles);
 
         $this->assertSame($configFile, $configFileMock);
+    }
+
+
+    public function testComplete(): void
+    {
+        $rm = new ResolveManager();
+        $rm->pushResolver(new ParameterResolver());
+
+        $loader = new Loader($rm, $this->getCachePath(''));
+        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config1.yaml')));
+        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config2.yaml')));
+        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config3.yaml')));
+
+        var_dump($loader->export());
     }
 }

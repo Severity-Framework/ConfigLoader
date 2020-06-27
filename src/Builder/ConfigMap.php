@@ -11,6 +11,7 @@ use function implode;
 use function is_array;
 use function is_int;
 use function sprintf;
+use function var_dump;
 
 /**
  * Class ConfigMap
@@ -104,15 +105,16 @@ class ConfigMap
      * Returns a part of the stored data by a given dot notated string.
      *
      * @param string $path
+     * @param string $delimiter
      *
      * @throws InvalidPathSegmentException
      * @throws NotExistingPathSegmentException
      *
      * @return mixed
      */
-    public function getByPath(string $path)
+    public function getByPath(string $path, string $delimiter = '.')
     {
-        $steps = explode('.', $path);
+        $steps = explode($delimiter, $path);
         $array = $this->configuration;
 
         $pathTaken = [];
@@ -121,11 +123,11 @@ class ConfigMap
             $pathTaken[] = $key;
 
             if (is_array($array) === false) {
-                throw new InvalidPathSegmentException(sprintf('Parameter "%s" is not an array!', implode('.', $pathTaken)));
+                throw new InvalidPathSegmentException(sprintf('Parameter "%s" is not an array!', implode($delimiter, $pathTaken)));
             }
 
             if (array_key_exists($key, $array) === false) {
-                throw new NotExistingPathSegmentException(sprintf('Parameter "%s" does not exist!', implode('.', $pathTaken)));
+                throw new NotExistingPathSegmentException(sprintf('Parameter "%s" does not exist!', implode($delimiter, $pathTaken)));
             }
 
             $array = $array[$key];

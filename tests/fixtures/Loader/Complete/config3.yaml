@@ -1,0 +1,7 @@
+parameters:
+    db.name: shop
+    db.user: shop
+    db.pass: mypass
+
+    secret:
+        passphrase: 'asdaasdasds'

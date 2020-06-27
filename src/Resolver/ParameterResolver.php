@@ -31,11 +31,11 @@ class ParameterResolver implements ResolverInterface
             $length = strlen($match);
             $match = substr(str_replace('\%', '%', $match), 1, -1);
 
-            if (preg_match('/^(?P<var>[a-zA-Z0-9\-\._%]+)(?:>>(\g<var>))+$/', $match) === 1) {
-                $match = str_replace('>>', '.', $match);
-            }
+//            if (preg_match('/^(?P<var>[a-zA-Z0-9\-\._%]+)(?:>>(\g<var>))+$/', $match) === 1) {
+//                $match = str_replace('>>', '.', $match);
+//            }
 
-            $resolved = $context->get($match);
+            $resolved = $context->get($match, '>>');
 
             $parameterValue = substr_replace($parameterValue, $resolved, $pos - $diff, $length);
 

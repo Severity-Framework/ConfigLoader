@@ -5,9 +5,11 @@ namespace Severity\ConfigLoader\Cache;
 use BadMethodCallException;
 use RuntimeException;
 use Severity\ConfigLoader\Builder\ConfigFile;
+use function array_filter;
 use function array_map;
 use function array_reduce;
 use function crc32;
+use function dirname;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -17,6 +19,7 @@ use function serialize;
 use function sprintf;
 use function substr;
 use function unserialize;
+use const PHP_EOL;
 
 /**
  * Class CacheLoader
@@ -113,10 +116,18 @@ class CacheStrategy
 
     public function store(array $config): string
     {
+        $this->wipeCache();
+
+        // Todo: instead of serialize generate a PHP return statement
         file_put_contents($this->fullPath . self::EXT_CACHE, serialize($config));
         file_put_contents($this->fullPath . self::EXT_META, $this->generateMeta());
 
         return $this->fullPath . self::EXT_CACHE;
+    }
+
+    protected function wipeCache(): void
+    {
+        array_map('unlink', array_filter(glob(dirname($this->fullPath) . '/*.*')));
     }
 
     protected function generateMeta(): string
@@ -128,6 +139,6 @@ class CacheStrategy
             $this->files
         );
 
-        return '<?php return [' . implode(',', $files) . '];';
+        return '<?php return [' . implode(',' . PHP_EOL, $files) . '];';
     }
 }

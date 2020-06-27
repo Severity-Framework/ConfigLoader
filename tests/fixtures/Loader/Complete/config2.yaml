@@ -1,0 +1,9 @@
+parameters:
+    app.user.items_per_page: 10
+
+    mysql:
+        dbname: '%db.name%'
+        user: '%db.user%'
+        pass: '%db.pass%'
+
+    pass: '%secret>>passphrase%'

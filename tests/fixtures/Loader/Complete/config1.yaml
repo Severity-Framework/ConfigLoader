@@ -1,0 +1,2 @@
+parameters:
+    app.account.items_per_page: 12

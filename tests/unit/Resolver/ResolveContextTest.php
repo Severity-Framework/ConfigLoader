@@ -26,7 +26,7 @@ class ResolveContextTest extends ConfigLoaderTestCase
                       ->with('parameters.foo');
 
         $context = new ResolveContext($configMapMock);
-        $context->get('foo');
+        $context->get('foo', '.');
     }
 
     /**
@@ -42,7 +42,7 @@ class ResolveContextTest extends ConfigLoaderTestCase
             ->with('parameters.foo');
 
         $context = new ResolveContext($configMapMock);
-        $context->exists('foo');
+        $context->exists('foo', '.');
     }
 
     /**
