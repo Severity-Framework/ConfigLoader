@@ -3,9 +3,10 @@
 namespace Severity\ConfigLoader\Tests\Unit\Builder;
 
 use InvalidArgumentException;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
-use function chmod;
 
 /**
  * Class ConfigFileTest
@@ -14,39 +15,11 @@ use function chmod;
  */
 class ConfigFileTest extends ConfigLoaderTestCase
 {
-    public static function getFiles(): array
+    protected vfsStreamDirectory $path;
+
+    protected function setUp(): void
     {
-        return glob(self::getFixturePath('Builder/ConfigFile/unreadable_*.yaml'));
-    }
-
-    /**
-     * Sets fixture files - prefixed with unreadable - to 0000 permission.
-     *
-     * @return void
-     */
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        umask(0000);
-
-        foreach (self::getFiles() as $file) {
-            chmod($file, 0000);
-        }
-    }
-
-    /**
-     * Sets fixture files - prefixed with unreadable - back to 0644 permission.
-     *
-     * @return void
-     */
-    public static function tearDownAfterClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        foreach (self::getFiles() as $file) {
-            chmod($file, 0644);
-        }
+        $this->path = vfsStream::setup();
     }
 
     /**
@@ -56,12 +29,10 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testConstructorForNotExistingFile(): void
     {
-        $filePath = self::getFixturePath('not/existing/file.yaml');
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(does not exist)/');
 
-        new ConfigFile($filePath);
+        new ConfigFile('not_existing_file.yaml');
     }
     /**
      * Tests {@see ConfigFile::__construct()}
@@ -70,12 +41,13 @@ class ConfigFileTest extends ConfigLoaderTestCase
      */
     public function testConstructorForNotReadable(): void
     {
-        $filePath = self::getFixturePath('Builder/ConfigFile/unreadable_example.yaml');
+        $mockFile = $this->mockFile('some_file.yaml');
+        $mockFile->chmod(0000);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(is not readable)/');
 
-        new ConfigFile($filePath);
+        new ConfigFile($mockFile->url());
     }
 
     /**

@@ -108,7 +108,9 @@ class CacheStrategy
         $cacheContent = file_get_contents($this->fullPath . self::EXT_CACHE);
 
         if ($cacheContent === false) {
+            // @codeCoverageIgnoreStart
             throw new RuntimeException(sprintf('Failed to load cache file "%s"!!', $cacheContent));
+            // @codeCoverageIgnoreEnd
         }
 
         return unserialize($cacheContent);

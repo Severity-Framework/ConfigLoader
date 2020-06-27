@@ -45,17 +45,16 @@ class LoaderTest extends ConfigLoaderTestCase
         $this->assertSame($configFile, $configFileMock);
     }
 
-
-    public function testComplete(): void
-    {
-        $rm = new ResolveManager();
-        $rm->pushResolver(new ParameterResolver());
-
-        $loader = new Loader($rm, $this->getCachePath(''));
-        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config1.yaml')));
-        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config2.yaml')));
-        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config3.yaml')));
-
-        var_dump($loader->export());
-    }
+//    public function testComplete(): void
+//    {
+//        $rm = new ResolveManager();
+//        $rm->pushResolver(new ParameterResolver(">>"));
+//
+//        $loader = new Loader($rm, $this->getCachePath(''));
+//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config1.yaml')));
+//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config2.yaml')));
+//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config3.yaml')));
+//
+//        var_dump($loader->export());
+//    }
 }

@@ -45,6 +45,8 @@ class ResolveManagerTest extends ConfigLoaderTestCase
     /**
      * Test {@see ResolveManager::pushResolver()} method.
      *
+     * @covers \Severity\ConfigLoader\ResolveManager::pushResolver
+     *
      * @return void
      */
     public function testPushResolver(): void
@@ -69,6 +71,11 @@ class ResolveManagerTest extends ConfigLoaderTestCase
     /**
      * Test {@see ResolveManager::resolve()} method.
      *
+     * @covers \Severity\ConfigLoader\ResolveManager::resolve
+     * @covers \Severity\ConfigLoader\ResolveManager::doResolve
+     * @covers \Severity\ConfigLoader\ResolveManager::resolveValue
+     * @covers \Severity\ConfigLoader\ResolveManager::resolveStringValue
+     *
      * @return void
      */
     public function testResolveWithNoMatch(): void
@@ -84,17 +91,17 @@ class ResolveManagerTest extends ConfigLoaderTestCase
         $resolverMock->expects($this->at(0))
                      ->method('translate')
                      ->with('baz', $fnMatchResolveContext)
-                     ->willReturn('baz');
+                     ->willReturn(null);
 
         $resolverMock->expects($this->at(1))
                      ->method('translate')
                      ->with('foo', $fnMatchResolveContext)
-                     ->willReturn('foo');
+                     ->willReturn(null);
 
         $resolverMock->expects($this->at(2))
                      ->method('translate')
                      ->with('foo-foo', $fnMatchResolveContext)
-                     ->willReturn('foo-foo');
+                     ->willReturn(null);
 
         $configMapMock = $this->createMock(ConfigMap::class);
         $configMapMock->expects($this->once())
@@ -118,6 +125,11 @@ class ResolveManagerTest extends ConfigLoaderTestCase
 
     /**
      * Test {@see ResolveManager::resolve()} method.
+     *
+     * @covers \Severity\ConfigLoader\ResolveManager::resolve
+     * @covers \Severity\ConfigLoader\ResolveManager::doResolve
+     * @covers \Severity\ConfigLoader\ResolveManager::resolveValue
+     * @covers \Severity\ConfigLoader\ResolveManager::resolveStringValue
      *
      * @return void
      */

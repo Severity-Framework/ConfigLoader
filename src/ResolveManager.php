@@ -92,7 +92,7 @@ class ResolveManager
         foreach ($this->configResolvers as $resolver) {
             $resolved = $resolver->translate($value, $context);
 
-            if ($resolved !== $value) {
+            if ($resolved !== null) {
                 return $resolved;
             }
         }
