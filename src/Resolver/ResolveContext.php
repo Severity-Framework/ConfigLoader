@@ -5,7 +5,6 @@ namespace Severity\ConfigLoader\Resolver;
 use Severity\ConfigLoader\Builder\ConfigMap;
 use function array_pop;
 use function array_push;
-use function var_dump;
 
 class ResolveContext
 {

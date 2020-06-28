@@ -3,7 +3,6 @@
 namespace Severity\ConfigLoader\Tests\Unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionException;
 use Severity\ConfigLoader\Builder\ConfigMap;
 use Severity\ConfigLoader\Contracts\ResolverInterface;
 use Severity\ConfigLoader\ResolveManager;

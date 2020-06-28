@@ -4,13 +4,10 @@ namespace Severity\ConfigLoader\Tests\Unit;
 
 use Severity\ConfigLoader\Builder\ConfigFile;
 use Severity\ConfigLoader\Loader;
-use PHPUnit\Framework\TestCase;
 use Severity\ConfigLoader\ResolveManager;
-use Severity\ConfigLoader\Resolver\ParameterResolver;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
 use function array_shift;
-use function var_dump;
 
 /**
  * Class LoaderTest
