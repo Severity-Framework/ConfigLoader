@@ -4,7 +4,7 @@ namespace Severity\ConfigLoader\Cache;
 
 use BadMethodCallException;
 use RuntimeException;
-use Severity\ConfigLoader\Builder\ConfigFile;
+use Severity\ConfigLoader\Builder\YamlFileResource;
 use function array_filter;
 use function array_map;
 use function array_reduce;
@@ -32,7 +32,7 @@ class CacheStrategy
     protected const EXT_META  = '.cache.properties';
 
     /**
-     * @var ConfigFile[]
+     * @var YamlFileResource[]
      */
     protected array $files;
 
@@ -43,8 +43,8 @@ class CacheStrategy
     /**
      * CacheConfiguration constructor.
      *
-     * @param ConfigFile[] $files
-     * @param string       $cachePath @todo: replace with LoaderConfiguration object
+     * @param YamlFileResource[] $files
+     * @param string             $cachePath @todo: replace with LoaderConfiguration object
      */
     public function __construct(array $files, string $cachePath)
     {
@@ -73,7 +73,7 @@ class CacheStrategy
 
     protected function generateCacheKey(): string
     {
-        $base = array_reduce($this->files, function(string $carry, ConfigFile $file): string {
+        $base = array_reduce($this->files, function(string $carry, YamlFileResource $file): string {
             return $carry . $file->getPath();
         }, '');
 
@@ -135,7 +135,7 @@ class CacheStrategy
     protected function generateMeta(): string
     {
         $files = array_map(
-            function (ConfigFile $file): string {
+            function (YamlFileResource $file): string {
                 return "'{$file->getPath()}'";
             },
             $this->files

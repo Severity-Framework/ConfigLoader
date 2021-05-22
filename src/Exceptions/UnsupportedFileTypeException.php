@@ -2,7 +2,7 @@
 
 namespace Severity\ConfigLoader\Exceptions;
 
-class NotExistingPathSegmentException extends ConfigLoaderException
+class UnsupportedFileTypeException extends ConfigLoaderException
 {
 
 }

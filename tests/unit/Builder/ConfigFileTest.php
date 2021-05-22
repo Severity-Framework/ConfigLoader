@@ -5,13 +5,13 @@ namespace Severity\ConfigLoader\Tests\Unit\Builder;
 use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
-use Severity\ConfigLoader\Builder\ConfigFile;
+use Severity\ConfigLoader\Builder\YamlFileResource;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 
 /**
  * Class ConfigFileTest
  *
- * @covers \Severity\ConfigLoader\Builder\ConfigFile
+ * @covers \Severity\ConfigLoader\Builder\YamlFileResource
  */
 class ConfigFileTest extends ConfigLoaderTestCase
 {
@@ -23,7 +23,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see ConfigFile::__construct()}
+     * Tests {@see YamlFileResource::__construct()}
      *
      * @return void
      */
@@ -32,10 +32,10 @@ class ConfigFileTest extends ConfigLoaderTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(does not exist)/');
 
-        new ConfigFile('not_existing_file.yaml');
+        new YamlFileResource('not_existing_file.yaml');
     }
     /**
-     * Tests {@see ConfigFile::__construct()}
+     * Tests {@see YamlFileResource::__construct()}
      *
      * @return void
      */
@@ -47,11 +47,11 @@ class ConfigFileTest extends ConfigLoaderTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/(is not readable)/');
 
-        new ConfigFile($mockFile->url());
+        new YamlFileResource($mockFile->url());
     }
 
     /**
-     * Tests {@see ConfigFile::fetch()} method.
+     * Tests {@see YamlFileResource::fetch()} method.
      *
      * @return void
      */
@@ -59,7 +59,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
     {
         $filePath = self::getFixturePath('Builder/ConfigFile/valid_example1.yaml');
 
-        $configFile = new ConfigFile($filePath);
+        $configFile = new YamlFileResource($filePath);
 
         $expected = [
             'parameters' => [
@@ -71,7 +71,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
     }
 
     /**
-     * Tests {@see ConfigFile::getPath()} method.
+     * Tests {@see YamlFileResource::getPath()} method.
      *
      * @return void
      */
@@ -79,7 +79,7 @@ class ConfigFileTest extends ConfigLoaderTestCase
     {
         $testPath = self::getFixturePath('Builder/ConfigFile/valid_example1.yaml');
 
-        $mockFile = new ConfigFile($testPath);
+        $mockFile = new YamlFileResource($testPath);
 
         $this->assertSame($testPath, $mockFile->getPath());
     }

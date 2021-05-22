@@ -1,5 +1,6 @@
 {
     "name": "severity/config-loader",
+    "description": "Configuration loader project",
     "authors": [
         {
             "name": "Zoltán Fekete",
@@ -7,11 +8,13 @@
         }
     ],
     "require": {
-      "ext-yaml": "*"
+        "php": "^8.0",
+        "ext-yaml": "*"
     },
     "require-dev": {
         "mikey179/vfsstream": "^1.6",
-        "phpunit/phpunit": "^9.1"
+        "phpunit/phpunit": "^9.5",
+        "symfony/var-dumper": "^5.2"
     },
     "autoload": {
         "psr-4": {

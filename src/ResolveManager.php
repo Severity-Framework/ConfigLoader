@@ -69,7 +69,7 @@ class ResolveManager
      *
      * @return string
      */
-    protected function resolveValue($value, ResolveContext $context)
+    protected function resolveValue(mixed $value, ResolveContext $context): mixed
     {
         if (is_string($value)) {
             return $this->resolveStringValue($value, $context);
@@ -87,7 +87,7 @@ class ResolveManager
      *
      * @return string
      */
-    protected function resolveStringValue(string $value, ResolveContext $context)
+    protected function resolveStringValue(string $value, ResolveContext $context): string
     {
         foreach ($this->configResolvers as $resolver) {
             $resolved = $resolver->translate($value, $context);

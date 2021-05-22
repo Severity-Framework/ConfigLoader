@@ -2,7 +2,7 @@
 
 namespace Severity\ConfigLoader\Builder;
 
-use Severity\ConfigLoader\Exceptions\ConfigMergeException;
+use Severity\ConfigLoader\Exceptions\ConfigLoaderException;
 use Severity\ConfigLoader\Exceptions\InvalidPathSegmentException;
 use Severity\ConfigLoader\Exceptions\NotExistingPathSegmentException;
 use function array_key_exists;
@@ -37,13 +37,13 @@ class ConfigMap
     /**
      * Merges the given array of data with the stored array.
      *
-     * @param ConfigFile $file
+     * @param YamlFileResource $file
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
-    public function merge(ConfigFile $file): void
+    public function merge(YamlFileResource $file): void
     {
         $this->fileInMerge = $file->getPath();
 
@@ -59,7 +59,7 @@ class ConfigMap
      * @param array    $b
      * @param string[] $path
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return array
      */
@@ -75,13 +75,13 @@ class ConfigMap
                 $target[$key] = $val;
             } elseif (is_array($val)) {
                 if (is_array($target[$key]) === false) {
-                    throw new ConfigMergeException(sprintf('Error during merging config file: %s! The existing key "%s" is not an array!', $this->fileInMerge, implode('.', $path)));
+                    throw new ConfigLoaderException(sprintf('Error during merging config file: %s! The existing key "%s" is not an array!', $this->fileInMerge, implode('.', $path)));
                 }
 
                 $target[$key] = $this->deepMerge($target[$key], $val, $path);
             } else {
                 if (is_array($a[$key])) {
-                    throw new ConfigMergeException(sprintf('Error during merging config file: %s! The existing key "%s" is an array!', $this->fileInMerge, implode('.', $path)));
+                    throw new ConfigLoaderException(sprintf('Error during merging config file: %s! The existing key "%s" is an array!', $this->fileInMerge, implode('.', $path)));
                 }
 
                 $target[$key] = $val;

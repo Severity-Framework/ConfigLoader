@@ -1,4 +1,4 @@
-FROM webdevops/php-dev:7.4
+FROM webdevops/php-dev:8.0
 
 # Optional args
 ARG BUILD_DEPS=1
@@ -12,6 +12,8 @@ ENV PATH_ROOT ${PATH_ROOT}
 ENV DEBIAN_FRONTEND "noninteractive"
 
 RUN apt-get update -y && apt-get upgrade -y && apt-get install -y curl nano sudo libyaml-dev ${EXTRA_TOOLS}
+
+COPY ./docker/config /
 
 RUN pecl install yaml
 

@@ -2,9 +2,7 @@
 
 namespace Severity\ConfigLoader\Exceptions;
 
-use Exception;
-
-class ConfigMergeException extends Exception
+class RecursiveValueReferenceException extends ConfigLoaderException
 {
 
 }

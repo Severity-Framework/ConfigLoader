@@ -6,9 +6,12 @@ services:
         build:
             context: ../
             dockerfile: docker/Dockerfile
+        environment:
+            XDEBUG_MODE: 'debug,coverage'
+            PHP_IDE_CONFIG: 'serverName=app'
         networks:
-        - "default"
+        - "config_loader_network"
 
 networks:
-    default:
+    config_loader_network:
         driver: bridge

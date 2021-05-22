@@ -9,7 +9,7 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
-use Severity\ConfigLoader\Builder\ConfigFile;
+use Severity\ConfigLoader\Builder\YamlFileResource;
 use Severity\ConfigLoader\Cache\CacheStrategy;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
@@ -40,11 +40,11 @@ class CacheStrategyTest extends ConfigLoaderTestCase
      * @param string $path
      * @param array $content
      *
-     * @return ConfigFile|MockObject
+     * @return YamlFileResource|MockObject
      */
-    protected function mockConfigFile(string $path, array $content): ConfigFile
+    protected function mockConfigFile(string $path, array $content): YamlFileResource
     {
-        $configFileMock = $this->createMock(ConfigFile::class);
+        $configFileMock = $this->createMock(YamlFileResource::class);
         $configFileMock->method('getPath')
                        ->willReturn($path);
         $configFileMock->method('fetch')

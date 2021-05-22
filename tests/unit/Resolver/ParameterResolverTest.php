@@ -83,31 +83,31 @@ class ParameterResolverTest extends ConfigLoaderTestCase
             [
                 'param-%param-1%', 'param-baz',
                 $this->mockResolveContext([[
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ]])
             ],
             [
                 'param-\%-%param-1%', 'param-%-baz',
                 $this->mockResolveContext([[
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ]])
             ],
             [
                 'param-\%-%param-\%-1%', 'param-%-baz',
                 $this->mockResolveContext([[
-                    'arg' => 'param-%-1',
+                    'arg'    => 'param-%-1',
                     'return' => 'baz'
                 ]])
             ],
             [
                 'param-\%-%param-1%-%param-1%', 'param-%-baz-baz',
                 $this->mockResolveContext([[
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ], [
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ]])
             ],
@@ -115,11 +115,11 @@ class ParameterResolverTest extends ConfigLoaderTestCase
                 'param-\%-%param-1%-%param-2%', 'param-%-baz-bar',
                 $this->mockResolveContext([[
                     'called' => 1,
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ], [
                     'called' => 1,
-                    'arg' => 'param-2',
+                    'arg'    => 'param-2',
                     'return' => 'bar'
                 ]])
             ],
@@ -127,11 +127,11 @@ class ParameterResolverTest extends ConfigLoaderTestCase
                 'param-\%-%param-1%-%param-2%', 'param-%-baz-bar',
                 $this->mockResolveContext([[
                     'called' => 1,
-                    'arg' => 'param-1',
+                    'arg'    => 'param-1',
                     'return' => 'baz'
                 ], [
                     'called' => 1,
-                    'arg' => 'param-2',
+                    'arg'    => 'param-2',
                     'return' => 'bar'
                 ]])
             ]
@@ -168,7 +168,7 @@ class ParameterResolverTest extends ConfigLoaderTestCase
                 'param-%param>>bar%', 'param-baz',
                 '>>',
                 $this->mockResolveContext([[
-                    'arg' => 'param>>bar',
+                    'arg'    => 'param>>bar',
                     'return' => 'baz'
                 ]])
             ],
@@ -176,7 +176,7 @@ class ParameterResolverTest extends ConfigLoaderTestCase
                 'param-%param>>bar>>foo%', 'param-baz',
                 '>>',
                 $this->mockResolveContext([[
-                    'arg' => 'param>>bar>>foo',
+                    'arg'    => 'param>>bar>>foo',
                     'return' => 'baz'
                 ]])
             ],
@@ -200,5 +200,12 @@ class ParameterResolverTest extends ConfigLoaderTestCase
         $this->createResolver($delimiter);
 
         $this->assertSame($expected, $this->resolver->translate($value, $context));
+    }
+
+    public function testTranslateMethodName(): void
+    {
+        $this->createResolver('>>');
+
+        $this->resolver->translate('%env(some_env)%');
     }
 }

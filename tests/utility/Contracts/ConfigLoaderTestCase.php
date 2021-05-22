@@ -6,7 +6,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Severity\ConfigLoader\Builder\ConfigFile;
+use Severity\ConfigLoader\Builder\YamlFileResource;
 use function dirname;
 use function explode;
 use function strpos;
@@ -66,11 +66,11 @@ class ConfigLoaderTestCase extends TestCase
     /**
      * @param mixed $returnValue
      *
-     * @return ConfigFile|MockObject
+     * @return YamlFileResource|MockObject
      */
-    public function mockConfigFileWithFetch($returnValue): ConfigFile
+    public function mockConfigFileWithFetch($returnValue): YamlFileResource
     {
-        $mock = $this->createMock(ConfigFile::class);
+        $mock = $this->createMock(YamlFileResource::class);
         $mock->method('fetch')
             ->willReturn($returnValue);
 
@@ -80,11 +80,11 @@ class ConfigLoaderTestCase extends TestCase
     /**
      * @param mixed $path
      *
-     * @return ConfigFile|MockObject
+     * @return YamlFileResource|MockObject
      */
-    public function mockConfigFileWithPath($path): ConfigFile
+    public function mockConfigFileWithPath($path): YamlFileResource
     {
-        $mock = $this->createMock(ConfigFile::class);
+        $mock = $this->createMock(YamlFileResource::class);
         $mock->method('getPath')
             ->willReturn($path);
 

@@ -1,9 +1,19 @@
 parameters:
     app.user.items_per_page: 10
 
+    secret:
+        passphrase: ''
+
+    loaders:
+    - '@something'
+    - 'another'
+
     mysql:
         dbname: '%db.name%'
         user: '%db.user%'
         pass: '%db.pass%'
 
     pass: '%secret>>passphrase%'
+
+services:
+    SomeClass: someText

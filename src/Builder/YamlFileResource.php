@@ -3,21 +3,19 @@
 namespace Severity\ConfigLoader\Builder;
 
 use InvalidArgumentException;
+use Severity\ConfigLoader\Contracts\ConfigurationResource;
 use function yaml_parse_file;
 
-class ConfigFile
+class YamlFileResource implements ConfigurationResource
 {
     protected string $path;
-
-    protected string $type;
 
     /**
      * ConfigFile constructor.
      *
      * @param string $path
-     * @param string $type
      */
-    public function __construct(string $path, string $type = 'yaml')
+    public function __construct(string $path)
     {
         if (file_exists($path) === false) {
             throw new InvalidArgumentException(sprintf('File on path "%s" does not exist!', $path));
@@ -28,7 +26,6 @@ class ConfigFile
         }
 
         $this->path = $path;
-        $this->type = $type;
     }
 
     public function getPath(): string

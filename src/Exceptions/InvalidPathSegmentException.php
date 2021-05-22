@@ -2,9 +2,7 @@
 
 namespace Severity\ConfigLoader\Exceptions;
 
-use Exception;
-
-class InvalidPathSegmentException extends Exception
+class InvalidPathSegmentException extends ConfigLoaderException
 {
 
 }

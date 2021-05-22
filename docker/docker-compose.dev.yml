@@ -2,7 +2,7 @@ version: '3'
 services:
     config-loader:
         volumes:
-        - ../:/app
+        - ../:/app:delegated
         build:
             args:
                 BUILD_DEPS: 0

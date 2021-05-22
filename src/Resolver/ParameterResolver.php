@@ -31,11 +31,11 @@ class ParameterResolver implements ResolverInterface
      * @param string         $parameterValue
      * @param ResolveContext $context
      *
-     * @return mixed|null
+     * @return mixed
      */
-    public function translate(string $parameterValue, ResolveContext $context)
+    public function translate(string $parameterValue, ResolveContext $context): mixed
     {
-        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9\-_>\.]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
+        if (preg_match_all('/(?<!\\\)%(?:[a-zA-Z0-9()\-_>.]|(\\\%))+(?<!\\\)%/', $parameterValue, $matches, PREG_OFFSET_CAPTURE) > 0) {
             return $this->doReplace($parameterValue, $matches, $context);
         }
 
@@ -45,6 +45,8 @@ class ParameterResolver implements ResolverInterface
     protected function doReplace(string $parameterValue, array $matches, ResolveContext $context): string
     {
         $diff = 0;
+        dd($matches, $context);
+
         foreach ($matches[0] as [$match, $pos]) {
             $length = strlen($match);
             $match = substr(str_replace('\%', '%', $match), 1, -1);

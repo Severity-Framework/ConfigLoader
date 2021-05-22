@@ -1,2 +1,31 @@
 parameters:
+    app.code_map:
+        '%app.code.dede%': '%app.id.dede%'
+        '%app.code.fvfr%': '%app.id.fvfr%'
+        '%app.code.engb%': '%app.id.engb%'
+        '%app.code.enus%': '%app.id.enus%'
+
     app.account.items_per_page: 12
+
+    app.code.dede: 'fvde'
+    app.code.fvfr: 'fvfr'
+    app.code.engb: 'fven'
+    app.code.enus: 'fvus'
+
+    app.id.dede: 1
+    app.id.fvfr: 2
+    app.id.engb: 4
+    app.id.enus: 5
+
+    url:
+        data:
+            '%app.code.dede%': 'https://url.com/%app.code.dede%'
+
+services:
+    Service2:
+        arguments:
+            $asdas: '%app.id.dede%'
+            $ssa: 'env(SOME_VAR)'
+            $asdad: '%app.account.items_per_page%-value-%app.code.dede%'
+
+doctrine:

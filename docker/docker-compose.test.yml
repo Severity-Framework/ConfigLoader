@@ -1,4 +1,4 @@
 version: '3'
 services:
     config-loader:
-        command: [ "php", "vendor/bin/phpunit" ]
+        command: [ "php", "-d xdebug.mode=coverage", "vendor/bin/phpunit", "--coverage-text", "--fail-on-warning", "--fail-on-risky" ]

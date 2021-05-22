@@ -3,7 +3,7 @@
 namespace Severity\ConfigLoader\Tests\Unit\Builder;
 
 use Severity\ConfigLoader\Builder\ConfigMap;
-use Severity\ConfigLoader\Exceptions\ConfigMergeException;
+use Severity\ConfigLoader\Exceptions\ConfigLoaderException;
 use Severity\ConfigLoader\Exceptions\InvalidPathSegmentException;
 use Severity\ConfigLoader\Exceptions\NotExistingPathSegmentException;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
@@ -19,7 +19,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) with 1 array.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -43,7 +43,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) method with associative arrays.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -95,7 +95,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) method with numeric arrays with scalar values.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -209,7 +209,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) method with numeric arrays with scalar values.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -359,7 +359,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) method with numeric arrays with scalar values.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -384,7 +384,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
         ]);
         //</editor-fold>
 
-        $this->expectException(ConfigMergeException::class);
+        $this->expectException(ConfigLoaderException::class);
 
         $map->merge($fileAMock);
         $map->merge($fileBMock);
@@ -393,7 +393,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
     /**
      * Test {@see ConfigMap::merge()) method with numeric arrays with scalar values.
      *
-     * @throws ConfigMergeException
+     * @throws ConfigLoaderException
      *
      * @return void
      */
@@ -418,7 +418,7 @@ class ConfigMapTest extends ConfigLoaderTestCase
         ]);
         //</editor-fold>
 
-        $this->expectException(ConfigMergeException::class);
+        $this->expectException(ConfigLoaderException::class);
 
         $map->merge($fileAMock);
         $map->merge($fileBMock);

@@ -2,20 +2,23 @@
 
 namespace Severity\ConfigLoader\Tests\Unit;
 
-use Severity\ConfigLoader\Builder\ConfigFile;
-use Severity\ConfigLoader\Loader;
+use Severity\ConfigLoader\Builder\YamlFileResource;
+use Severity\ConfigLoader\ConfigLoader;
 use PHPUnit\Framework\TestCase;
+use Severity\ConfigLoader\Strategy\ValueResolution\IterativeValueResolutionStrategy;
+use Severity\ConfigLoader\Strategy\Merge\RecursiveMergeStrategy;
 use Severity\ConfigLoader\ResolveManager;
 use Severity\ConfigLoader\Resolver\ParameterResolver;
 use Severity\ConfigLoader\Tests\Utility\Contracts\ConfigLoaderTestCase;
 use Severity\ConfigLoader\Tests\Utility\Traits\VisibilityHelper;
 use function array_shift;
+use function array_unshift;
 use function var_dump;
 
 /**
  * Class LoaderTest
  *
- * @covers \Severity\ConfigLoader\Loader
+ * @covers \Severity\ConfigLoader\ConfigLoader
  */
 class LoaderTest extends ConfigLoaderTestCase
 {
@@ -28,33 +31,37 @@ class LoaderTest extends ConfigLoaderTestCase
         $this->resolveManager = $this->createMock(ResolveManager::class);
     }
 
-    public function testLoadConfig(): void
+    public function testComplete(): void
     {
-        $loader = new Loader($this->resolveManager, '');
-        $configFileMock = $this->createMock(ConfigFile::class);
+        $loader = new ConfigLoader(
+            new RecursiveMergeStrategy(),
+            new IterativeValueResolutionStrategy()
+        );
 
-        $loader->loadConfig($configFileMock);
+        $loader->loadFile($this->getFixturePath('Loader/Complete/config1.yaml'), 'yaml');
+        // $loader->loadFile($this->getFixturePath('Loader/Complete/config2.yaml'), 'yaml');
+        // $loader->loadFile($this->getFixturePath('Loader/Complete/config3.yaml'), 'yaml');
+        $config = $loader->export();
 
-        $configFiles = $this->getProperty($loader, 'configFiles');
+        dd($config);
 
-        $this->assertCount(1, $configFiles);
+        $fileLoader = new ConfigFileFinder($loader);
+        $fileLoader->import($this->getFixturePath('/config/**/cache.yaml'));
 
-        /** @var ConfigFile $configFile */
-        $configFile = array_shift($configFiles);
+        // Simply get the output
+        // ---------------------
+        // Or use caching
+        $dumper             = new Dumper();
+        $configCacheService = new ConfigCache($loader);
 
-        $this->assertSame($configFile, $configFileMock);
+
+
+       
+
+        $loader->loadConfig(new YamlFileResource($this->getFixturePath('Loader/Complete/config1.yaml')));
+        $loader->loadConfig(new YamlFileResource($this->getFixturePath('Loader/Complete/config2.yaml')));
+        $loader->loadConfig(new YamlFileResource($this->getFixturePath('Loader/Complete/config3.yaml')));
+
+        var_dump($loader->export());
     }
-
-//    public function testComplete(): void
-//    {
-//        $rm = new ResolveManager();
-//        $rm->pushResolver(new ParameterResolver(">>"));
-//
-//        $loader = new Loader($rm, $this->getCachePath(''));
-//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config1.yaml')));
-//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config2.yaml')));
-//        $loader->loadConfig(new ConfigFile($this->getFixturePath('Loader/Complete/config3.yaml')));
-//
-//        var_dump($loader->export());
-//    }
 }
