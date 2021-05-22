@@ -36,6 +36,16 @@ class IterativeValueResolutionStrategy implements ValueResolveStrategy
 
     public function __construct(protected string $levelDelimiter = self::DEFAULT_LEVEL_DELIMITER) { }
 
+    /**
+     * @param array $configuration
+     *
+     * @throws InvalidPathSegmentException
+     * @throws NoPathGivenException
+     * @throws NotExistingPathSegmentException
+     * @throws RecursiveValueReferenceException
+     *
+     * @return array
+     */
     public function resolveValues(array $configuration): array
     {
         $referenceStack = new ReferenceStack();
@@ -93,11 +103,17 @@ class IterativeValueResolutionStrategy implements ValueResolveStrategy
      * @param mixed    $key
      * @param mixed    $value
      * @param string[] $path
+
      * @param ResolvingContext $context
      *
+     * @throws InvalidPathSegmentException
+     * @throws NoPathGivenException
+     * @throws NotExistingPathSegmentException
+     * @throws RecursiveValueReferenceException
+
      * @return array|null
      *
-     * @psalm-return array{array-key, mixed}|null
+     * @psalm-return array{array-key, string|null}|null
      */
     protected function processNode(int|string $key, mixed $value, array $path, ResolvingContext $context): ?array
     {
@@ -124,7 +140,19 @@ class IterativeValueResolutionStrategy implements ValueResolveStrategy
         return null;
     }
 
-    protected function process(int|string $key, array $path, ResolvingContext $context): mixed
+    /**
+     * @param int|string       $key
+     * @param array            $path
+     * @param ResolvingContext $context
+     *
+     * @throws InvalidPathSegmentException
+     * @throws NoPathGivenException
+     * @throws NotExistingPathSegmentException
+     * @throws RecursiveValueReferenceException
+     *
+     * @return string|null
+     */
+    protected function process(int|string $key, array $path, ResolvingContext $context): ?string
     {
         $matches = $this->getMatches($key);
 
@@ -215,7 +243,7 @@ class IterativeValueResolutionStrategy implements ValueResolveStrategy
                 }
 
                 throw new NotExistingPathSegmentException($message);
-            } catch (NoPathGivenException $_) {
+            } catch (NoPathGivenException) {
                 // In case the resolvable reference is on the root level. The parent is absent.
             }
 
